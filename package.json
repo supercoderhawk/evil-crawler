@@ -1,0 +1,14 @@
+{
+  "name": "evil-crawler",
+  "version": "1.0.0",
+  "description": "crawler some xx",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "supercoderhawk",
+  "license": "MIT",
+  "dependencies": {
+    "crawler": "^1.0.4"
+  }
+}
