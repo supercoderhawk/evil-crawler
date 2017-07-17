@@ -4,49 +4,110 @@ var md5 = require('js-md5');
 
 var proxy = 'http://127.0.0.1:1080';
 
-var category = new Crawler({
+var sequences = new Crawler({
 	maxConnections: 10,
 	callback: function(error, res, done) {
 		if (error) {
 			console.log(error);
 		} else {
 			var $ = res.$;
-			if(res.options.start){
+			if (res.options.start) {
 				var baseUrl = res.request.uri;
 				var pages = $('.models-page-box>nav>.pagination>li>a');
 				var count = pages.last().attr('href').split('/').slice(-1)[0];
 				console.log(count);
-				for(var i = 2; i <= count;i++){
-					category.queue({uri:baseUrl+'/page/'+i,proxy:proxy});
+				for (var i = 1; i <= 1; i++) {
+					sequences.queue({
+						uri: baseUrl.href + '/page/' + i,
+						proxy: proxy
+					});
 				}
 			}
-
 			$('#ajax-fax>*>.video-item>.featured-content-image>a')
 				.each(function() {
 					var url = $(this).attr('href');
-					console.log(url);
-					//video.queue({uri:url,proxy:proxy});
+					video.queue({
+						uri: url,
+						proxy: proxy
+					});
 				});
+			$('#ajax-fax>*>.entry-title').each(function() {
+				var elem = $(this);
+				var date = null;
+				elem.contents().each(function() {
+					if (this.nodeType === 3) {
+						date = $(this).text().replace(/\s/g, '');
+					}
+				});
+				var url = elem.find('h4>a').attr('href');
+			});
 		}
 		done();
 	}
 });
 
 var video = new Crawler({
-	maxConnections: 1,
+	maxConnections: 10,
 	callback: function(error, res, done) {
 		if (error) {
 			console.error(error);
 		} else {
-			var url = getOpenioUrl(res);
-			console.log(url);
+			var $ = res.$;
+			var url = getOpenioUrl(res, $);
+			var title = $('title').text();
+			var titleGroup = title.split(' ');
+			var id = titleGroup[0].startsWith('[中文字幕]') ? titleGroup[0].substr(6) : titleGroup[0];
+			var name = titleGroup[1];
+			var style = $('#JKDiv_0').attr('style')
+			var re = /url\(([a-zA-Z0-9:/._-]*?)\)/;
+			if (re.test(style)) {
+				var imageUrl = re.exec(style)[1];
+			} else {
+
+			}
+			var context = $('body>.video-box-ather>.container>.video-countext');
+			var models = {};
+			context.children('.video-countext-Models').children('.models-content')
+				.children('a').each(function() {
+					var elem = $(this);
+					var name = elem.text();
+					var url = elem.attr('href');
+					var imgUrl = elem.children('img').attr('src');
+				});
+			var categories = {};
+			context.children('.video-countext-categories')
+				.children('a').each(function() {
+					var elem = $(this);
+					var category = elem.text();
+					var url = elem.attr('href');
+					categories[category] = url
+				});
+			var tags = {};
+			context.children('.video-countext-tags')
+				.children('a').each(function() {
+					var elem = $(this);
+					var tag = elem.text();
+					var url = elem.attr('href');
+					tags[tag] = url;
+				});
 		}
 		done();
 	}
 });
 
-function getOpenioUrl(res) {
-	var $ = res.$;
+var model = new Crawler({
+	maxConnections: 10,
+	callback: function(err, res, data) {
+		if (err) {
+			console.log(err);
+		} else {
+			var $ = res.$;
+		}
+		done();
+	}
+});
+
+function getOpenioUrl(res, $) {
 	var pattern = /\"(.*)\"/;
 	var gu = $('.video-server>script').text().match(pattern)[1]
 	var salt = 'sAfgz8HcR5';
@@ -61,10 +122,16 @@ function getOpenioUrl(res) {
 	}
 	return url = Buffer.from(code, 'base64').toString();
 }
-
-category.queue({
+/*
+video.queue({
+	uri: 'http://hpjav.com/tw/25299/ongp-008c_watch-online',
+	proxy: 'http://127.0.0.1:1080'
+});
+*/
+var sequencesUrl = ['http://hpjav.com/tw/category/censored-marker/chinese-subtitles'];
+sequences.queue({
 	//uri: 'http://hpjav.com/tw/17174/ftn-040c_watch-online',
 	uri: 'http://hpjav.com/tw/category/censored-marker/chinese-subtitles',
 	proxy: 'http://127.0.0.1:1080',
-	start:true
+	start: true
 });
