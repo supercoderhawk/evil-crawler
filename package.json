@@ -10,6 +10,7 @@
   "author": "supercoderhawk",
   "license": "MIT",
   "dependencies": {
-    "crawler": "^1.0.4"
+    "crawler": "^1.1.2",
+    "js-md5": "^0.7.3"
   }
 }
