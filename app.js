@@ -5,7 +5,7 @@ var md5 = require('js-md5');
 var proxy = 'http://127.0.0.1:1080';
 
 var sequences = new Crawler({
-	maxConnections: 10,
+	maxConnections: 1,
 	callback: function(error, res, done) {
 		if (error) {
 			console.log(error);
@@ -40,6 +40,7 @@ var sequences = new Crawler({
 				});
 				var url = elem.find('h4>a').attr('href');
 				videos[url] = date;
+				// console.log(url);
 			});
 			// console.log(JSON.stringify(videos));
 			for(var v in videos){
@@ -51,13 +52,14 @@ var sequences = new Crawler({
 });
 
 var video = new Crawler({
-	maxConnections: 10,
+	maxConnections: 1,
 	callback: function(error, res, done) {
 		if (error) {
 			console.error(error);
 		} else {
 			var $ = res.$;
 			var url = getOpenioUrl(res, $);
+			console.log(url);
 			var titleGroup = $('title').text().split(' ');
 			var id = titleGroup[0].startsWith('[中文字幕]') ? titleGroup[0].substr(6) : titleGroup[0];
 			var name = titleGroup[1];
@@ -126,7 +128,7 @@ var model = new Crawler({
 function getOpenioUrl(res, $) {
 	var pattern = /\"(.*)\"/;
 	var gu = $('.video-server>script').text().match(pattern)[1]
-	var salt = 'sAfgz8HcR5';
+	var salt = 'KrtAaR5PoRD9';
 	var hash = md5.create();
 	hash.update(gu + salt);
 	var key = hash.hex().split('').reverse().join('');
